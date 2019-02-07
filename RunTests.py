@@ -22,7 +22,7 @@ STRENGTH_STDEV = 0.130921998163
 
 # These are fixed parameters chosen subjectively
 STEP = .05
-utilRanges=[(0, .4), (.3, .7), (.6, 1), (0, 1)] # Low, mid, high, and wide. TODO: Bimodel
+utilRanges=[(0, 1), (0, .4), (.3, .7), (.6, 1)] # Wide, low, mid, high. TODO: Bimodel
 
 setsCompleted=1
 for utilBound in utilRanges:
