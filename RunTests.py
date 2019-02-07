@@ -26,8 +26,8 @@ utilRanges=[(0, .4), (.3, .7), (.6, 1), (0, 1)] # Low, mid, high, and wide. TODO
 
 setsCompleted=1
 for utilBound in utilRanges:
-    for strength_stdev in [STRENGTH_STDEV * (x + 1) for x in range(STRENGTH_STDEV_MULTIPLIER)]:
-        for friend_stdev in [FRIEND_STDEV * (x + 1) for x in range(FRIEND_STDEV_MULTIPLIER)]:
+    for strength_stdev in [STRENGTH_STDEV * (x + 1) for x in [STRENGTH_STDEV_MULTIPLIER]]:
+        for friend_stdev in [FRIEND_STDEV * (x + 1) for x in [FRIEND_STDEV_MULTIPLIER]]:
             paramResults = ModTestParameters.runParamTest(ENABLE_OPTIMAL, M, STEP, TASK_TARGET, .5 * M, utilBound[0], utilBound[1], 10, 100, strength_stdev, friend_stdev, STRENGTH_MEAN, FRIEND_MEAN)
             with open(FILE_OUT, "a") as f:
                 print("*****", file=f) # Sample delimiter
