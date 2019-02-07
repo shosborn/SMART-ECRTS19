@@ -8,32 +8,26 @@ AWARE_START_THREAD=SMART.Partition.AWARE_START_THREAD
 AWARE_START_OBLIV=SMART.Partition.AWARE_START_OBLIV
 OPTIMAL=SMART.Partition.OPTIMAL
 NUM_METHODS=5
+FRACTION_TO_EXPLORE = .75
 
 def runParamTest(useOpt, m, binSize, max, beginUtil, utilMin, utilMax, periodMin, periodMax, strength_stdev, friend_stdev, strength_mean, friend_mean):
-    #m=2
 
-    #max=100
-    #binSize=.05
-    numBins=int(np.ceil(1.6*m/binSize))
-    theBins=[]
+    numBins = int(np.ceil((m*FRACTION_TO_EXPLORE)/binSize))
+    theBins = []
     for i in range(0, numBins):
-        theBins.append([0]*11)
-    #myResults=TaskSetResults(myTaskSet.totalUtil)
+        theBins.append([0] * 11)
 
-    parameterResults=[]
+    parameterResults = []
 
-
-    #for count in range(1, max+1):
     while theBins[0][0] < max:
-        #myTaskSet = SMART.TaskSet(.5*m, 0, .3, 10, 100, .7, 1, .7, 1, .1)
         myTaskSet = SMART.TaskSet(beginUtil, utilMin, utilMax, periodMin, periodMax, strength_stdev, friend_stdev, strength_mean, friend_mean)
         while True:
             #partition and test task set
-            while myTaskSet.totalUtil<m:
+            while myTaskSet.totalUtil < m:
                 myTaskSet.addTask()
-            myBin=int(np.floor((myTaskSet.totalUtil-m)/binSize))
-            theBins[myBin][0]=theBins[myBin][0]+1
-            success=False
+            myBin = int(np.floor((myTaskSet.totalUtil - m) / binSize))
+            theBins[myBin][0] += 1
+            success = False
             #systemResults=[None] * 11
             #parameterResults.append(systemResults)
             #systemResults[0]=myTaskSet.totalUtil
@@ -62,10 +56,10 @@ def runParamTest(useOpt, m, binSize, max, beginUtil, utilMin, utilMax, periodMin
             for i in range (1, 11):
                 systemResults[i]=False
         '''
-        while totalUtil<2*m:
-            totalUtil=totalUtil+random() * (myTaskSet.utilMax - myTaskSet.utilMin) + myTaskSet.utilMin
+        while totalUtil < m * FRACTION_TO_EXPLORE:
+            totalUtil = totalUtil + random() * (myTaskSet.utilMax - myTaskSet.utilMin) + myTaskSet.utilMin
             myBin = int(np.floor((totalUtil - m) / binSize))
-            theBins[myBin][0]=theBins[myBin][0]+1
+            theBins[myBin][0] += 1
     #for sysResult in parameterResults:
      #    print(sysResult)
 
