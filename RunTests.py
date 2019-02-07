@@ -5,53 +5,40 @@ import SMART
 import sys
 import csv
 
+# Required
 M = int(sys.argv[1])
 TASK_TARGET = int(sys.argv[2])
+FILE_OUT = sys.argv[3]
 
-ENABLE_OPTIMAL = bool(int(sys.argv[4]))
-FILE_OUT = sys.argv[5]
+# Optional multipliers
+ENABLE_OPTIMAL = bool(int(sys.argv[4])) if len(sys.argv) > 5 else False 
+STRENGTH_STDEV_MULTIPLIER = int(sys.argv[5]) if len(sys.argv) >= 7 else 1
+FRIEND_STDEV_MULTIPLIER = int(sys.argv[6]) if len(sys.argv) >= 7 else 1
 
-#(setUtil, utilMin, utilMax, periodMin, periodMax, rMin, rMax, fMin, fMax, epsilon)
+# These parameters are derived from a statistical analysis of experimental results
+FRIEND_MEAN = STRENGTH_MEAN = 0.715825523745
+FRIEND_STDEV = 0.0426836366557
+STRENGTH_STDEV = 0.130921998163
 
-
+# These are fixed parameters chosen subjectively
 STEP = .05
-#max=1000
-
-#coreCounts=[4, 8, 16, 32]
-
-#resilRanges=[(.65, 1),(.7, 1), (.75, 1), (.8, 1)]
-
-#friendlyRanges=[(.65, 1),(.7, 1), (.75, 1), (.8, 1)]
-
 utilRanges=[(0, .4), (.3, .7), (.6, 1), (0, 1)] # Low, mid, high, and wide. TODO: Bimodel
 
-#epsilon=[0.01, 0.055, 0.1]
-
-#utilHigh=1
-#u=[]
-#u.append(utilLow)
-#u.append(utilHigh)
-
-#test values
-
 setsCompleted=1
+for utilBound in utilRanges:
+    for strength_stdev in [STRENGTH_STDEV * (x + 1) for x in range(STRENGTH_STDEV_MULTIPLIER)]:
+        for friend_stdev in [FRIEND_STDEV * (x + 1) for x in range(FRIEND_STDEV_MULTIPLIER)]:
+            paramResults = ModTestParameters.runParamTest(ENABLE_OPTIMAL, M, STEP, TASK_TARGET, .5 * M, utilBound[0], utilBound[1], 10, 100, strength_stdev, friend_stdev, STRENGTH_MEAN, FRIEND_MEAN)
+            with open(FILE_OUT, "a") as f:
+                print("*****", file=f) # Sample delimiter
+                csvWriter = csv.writer(f)
+                csvWriter.writerow([M, STEP, TASK_TARGET, utilBound[0], utilBound[1], 10, 100, strength_stdev, friend_stdev])
+                binSize = M
+                for row in paramResults:
+                    csvWriter.writerow([binSize] + row)
+                    binSize += STEP
+            # User-visible status
+            print(FILE_OUT, setsCompleted, utilBound[0], utilBound[1], strength_stdev, friend_stdev)
+            setsCompleted += 1
 
-# TEMP
-e = 0
-r = fr = [0,0]
-
-for u in utilRanges:
-      paramResults = ModTestParameters.runParamTest(ENABLE_OPTIMAL, M, STEP, TASK_TARGET, .5 * M, u[0], u[1], 10, 100, r[0], r[1], fr[0], fr[1], e)
-      with open(FILE_OUT, "a") as f:
-          print("*****", file=f) # Sample delimiter
-          print(M, ",", STEP, ",", TASK_TARGET, ",", u[0], ",", u[1], ",", 10, ",", 100, ",", r[0], ",", r[1], ",", fr[0], ",", fr[1], ",", e, file=f)
-          csvWriter = csv.writer(f)
-          binSize = M
-          for row in paramResults:
-              csvWriter.writerow([binSize] + row)
-              binSize += STEP
-      # User-visible status
-      print(FILE_OUT, setsCompleted, u[0], u[1])
-      setsCompleted += 1
-
-print(FILE_OUT, "complete!")
+print(FILE_OUT, "Complete!")

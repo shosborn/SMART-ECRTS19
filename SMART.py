@@ -2,34 +2,24 @@ from random import *
 import numpy as np
 import itertools
 
-# def main():
-#   TaskSet(8, .7, 1, 10, 100, .7, 1, .7, 1, .1)
-
-
 FAKE_ZERO = 0.00000000001
 UMA_RESULT=0
 FUNK_RESULT=1
 
-# These parameters are derived from a statistical analysis of experimental results
-FRIEND_MEAN = RESIL_MEAN = 0.715825523745
-FRIEND_STDEV = 0.0426836366557
-RESIL_STDEV = 0.130921998163
-
 class TaskSet:
     """Description String"""
 
-    def __init__(self, setUtil, utilMin, utilMax, periodMin, periodMax, rMin, rMax, fMin, fMax, epsilon):
+    def __init__(self, setUtil, utilMin, utilMax, periodMin, periodMax, strength_stdev, friend_stdev, strength_mean, friend_mean):
         """Creates taskSet made of SmartTasks"""
         self.setUtil = setUtil
         self.utilMin = utilMin
         self.utilMax = utilMax
         self.periodMin = periodMin
         self.periodMax = periodMax
-        self.rMin = rMin
-        self.rMax = rMax
-        self.fMin = fMin
-        self.fMax = fMax
-        self.epsilon = epsilon
+        self.strength_stdev = strength_stdev
+        self.friend_stdev = friend_stdev
+        self.strength_mean = strength_mean
+        self.friend_mean = friend_mean
         self.allTasks = []
         self.partitionList = [None] * 10
 
@@ -41,15 +31,10 @@ class TaskSet:
             util = random() * (utilMax - utilMin) + utilMin
             period = random() * (periodMax - periodMin) + periodMin
 
-            friend = gauss(FRIEND_MEAN, FRIEND_STDEV)
-            resil = gauss(RESIL_MEAN, RESIL_STDEV)
-            #friend = random() * (self.fMax - self.fMin) + self.fMin
-            #resil = random() * (self.rMax - self.rMin) + self.rMin
+            friend = gauss(friend_mean, friend_stdev)
+            resil = gauss(strength_mean, strength_stdev)
             self.allTasks.append(SmartTask(util, period, friend, resil, permID))
             self.totalUtil = self.totalUtil + util
-            # print(permID)
-            # print(self.allTasks[permID])
-            # update total util
             permID = permID + 1
         nTotal = permID
 
@@ -59,7 +44,6 @@ class TaskSet:
             task.symRaw = []
             task.symAdj = []
             for j in range(0, nTotal):
-                #task.symRaw.append(task.resil * self.allTasks[j].friend + (random() * 2 * epsilon - epsilon))
                 task.symRaw.append((task.resil + self.allTasks[j].friend) / 2.0)
                 if i==j:
                     task.symAdj.append(1)
@@ -76,19 +60,16 @@ class TaskSet:
         nTotal=permID=len(self.allTasks)
         util = random() * (self.utilMax - self.utilMin) + self.utilMin
         period = random() * (self.periodMax - self.periodMin) + self.periodMin
-        friend = gauss(FRIEND_MEAN, FRIEND_STDEV)
-        resil = gauss(RESIL_MEAN, RESIL_STDEV)
-        #friend = random() * (self.fMax - self.fMin) + self.fMin
-        #resil = random() * (self.rMax - self.rMin) + self.rMin
+        friend = gauss(self.friend_mean, self.friend_stdev)
+        resil = gauss(self.strength_mean, self.strength_stdev)
         self.allTasks.append(SmartTask(util, period, friend, resil, permID))
         self.totalUtil = self.totalUtil + util
         #set sym values for new task
-        task=self.allTasks[permID]
-        nTotal=nTotal+1
+        task = self.allTasks[permID]
+        nTotal += 1
         task.symRaw = []
         task.symAdj = []
         for j in range(0, nTotal):
-            #task.symRaw.append(task.resil * self.allTasks[j].friend + (random() * 2 * self.epsilon - self.epsilon))
             task.symRaw.append((task.resil + self.allTasks[j].friend) / 2.0)
             if permID == j:
                 task.symAdj.append(1)
@@ -100,8 +81,7 @@ class TaskSet:
                 task.symAdj.append(task.symRaw[j])
         #update sym values for existing tasks
         for j in range(0, nTotal):
-            old=self.allTasks[j]
-            #old.symRaw.append(old.resil * task.friend + (random() * 2 * self.epsilon -self.epsilon))
+            old = self.allTasks[j]
             old.symRaw.append((old.resil + task.friend) / 2.0)
             if old.symRaw[permID]<=0:
                 old.symAdj.append(FAKE_ZERO)
@@ -219,12 +199,13 @@ class Partition:
             Uma=1
         else:
             Uma=0
-        sum2 = sum1 + threadedUtilList[int(2 * mh + 1)]
-        if sum1 <= 2 * mh + ah and sum2 <= 2 * (mh + ah):
-            Funk=1
-        else:
-            Funk=0
-        return(Uma, Funk)
+        # Disable funk for now
+        #sum2 = sum1 + threadedUtilList[int(2 * mh + 1)]
+        #if sum1 <= 2 * mh + ah and sum2 <= 2 * (mh + ah):
+        #    Funk=1
+        #else:
+        #    Funk=0
+        return(Uma, 0)#Funk)
 
     def coresNeededShared(self):
         threadedUtilList = []
