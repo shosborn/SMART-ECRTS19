@@ -1,0 +1,8 @@
+#!/bin/bash
+startTime=$(date +%N)
+echo start time $startTime
+$1
+stopTime=$(date +%N)
+echo stop time $stopTime
+totalTime=`expr $stopTime - $startTime`
+echo total time $totalTime
