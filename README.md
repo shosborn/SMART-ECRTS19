@@ -1,6 +1,9 @@
 # Schedulability Study and SMART-Interference Measurement Code
 
-This repository contains the code to execute the schedulability studies and experiments for the ECRTS'19 submission, "Simultaneous Multithreading Applied to Real Time" by Sims Hill Osborne, Joshua J. Bakita, and James H. Anderson. We also include our experimental results.
+This repository contains the code to execute the schedulability studies and
+experiments for the ECRTS'19 submission, "Simultaneous Multithreading Applied
+to Real Time" by Sims Hill Osborne, Joshua J. Bakita, and James H. Anderson.
+Experiment and study raw results are also archived here.
 
 ## Overview
 
