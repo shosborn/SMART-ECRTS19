@@ -15,7 +15,8 @@ can be reproduced by running the same script with a lower sample count (i.e.
   [0.6, 1) with periods inside the window [10, 100].
 - `./1st-run-archive` contains our first run of this benchmark suite with the
   updated modeling. Contains a large amount of repeated data due to bad
-  permutation management. **DEPRECATED**
+  permutation management. **DEPRECATED**: Not used in the paper and simply
+  stored here for archival purposes.
 
 ## Titling Disambiguation
 
