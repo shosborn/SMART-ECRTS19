@@ -7,7 +7,7 @@ Experiment and study raw results are also archived here.
 
 ## Overview
 
-Each folder in this repository corresponds to one of our code bases and seperately contains help files
+Each subdirectory corresponds to one of our code bases and each contains separate READMEs documenting setup, execution, and analysis alongside our archived raw experimental data.
 - `/interference-benchmark` contains our version of TACLeBench modified to measure SMT interference costs and contains our results from those experiments
 - `/gaussian-average` contains our schedulability study code and results from when using the _gaussian-average_ inter-task interference model
 - `/uniform-normal` contains our schedulability study code and results from when using the _uniform-normal_ inter-task interference model
