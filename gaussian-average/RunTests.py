@@ -4,11 +4,16 @@ import ModTestParameters
 import SMART
 import sys
 import csv
+import os.path
 
 # Required
 M = int(sys.argv[1])
 TASK_TARGET = int(sys.argv[2])
 FILE_OUT = sys.argv[3]
+
+if os.path.isfile(FILE_OUT):
+    print("Output file " + FILE_OUT + " already exists. Aborting...")
+    exit(1)
 
 # Optional multipliers
 ENABLE_OPTIMAL = bool(int(sys.argv[4])) if len(sys.argv) > 5 else False 
