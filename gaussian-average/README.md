@@ -2,19 +2,33 @@
 
 ## Running
 
-All the `./results` data can be modeled by simply running the following shell scripts:
-```
-./run_4-32_100_mixed_stdev.sh
-./run_4-32_500_mixed_stdev.sh
-./run_4-32_1000_mixed_stdev.sh
-```
-Each will yield a full premuted set of results under 100, 500, or 1000 samples.
-
-## Disambiguation
-
-In `results` 
+All the `./results` data used in the paper can be modeled by simply running
+`./run_4-32_1000_mixed_stdev.sh 1000`. The other, lower resolution test data
+can be reproduced by running the same script with a lower sample count (i.e.
+100 or 500 rather than 1000).
 
 ## Results Guide
 
-- `./1st-run-archive` contains our first run of this benchmark suite with the updated modeling. Contains a large amount of repeated data due to bad permutation management. **DEPRECATED**
-- `./results` contains the primary results used in the paper. This models standard deviation multipliers from the sets [1,2] and [2,3] for both `s` and `f`.
+- `./results` contains the primary results used in the paper. This models
+  standard deviation multipliers from the sets [1,3] for both `s` and `f` and
+  utilization windows of (0, 1), (0, 0.4], [0.3, 0.7], and [0.6, 1).
+- `./1st-run-archive` contains our first run of this benchmark suite with the
+  updated modeling. Contains a large amount of repeated data due to bad
+  permutation management. **DEPRECATED**
+
+## Titling Disambiguation
+
+In `./results`, each file is titled in the format
+`<core count>_<iteration count>_<s standard deviation multiplier>_<f standard deviation multiplier>_normal.txt`
+where angle brackets represent substitutions.
+
+## Data Format
+
+Each result file contains four runs (one for each of the four utilization
+ranges). The beginning of one of these runs is indicated by a single line
+containing `*****`. The immediately following header line indicates the setting
+on each of the test variables in the format
+`<core count>_<bin size>_<iteration count>_<lower utilization bound>_<upper utilization bound>_<lower period bound>_<upper period bound>_<strength standard deviation>_<friendliness standard deviation>`.
+The following lines each indicate the aggregate results from a test utilization
+bin in the format:
+`<lower bound of utilization bin>,<total tasks>,<tasks schedulable with Oblivious>,<tasks schedulable with Greedy-Thread>,<tasks schedulable with Greedy-Physical>,<tasks schedulable with Greedy-Mixed>,0,0,0,0,0,0`.
