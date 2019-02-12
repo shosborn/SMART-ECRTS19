@@ -10,8 +10,9 @@ can be reproduced by running the same script with a lower sample count (i.e.
 ## Results Guide
 
 - `./results` contains the primary results used in the paper. This models
-  standard deviation multipliers from the sets [1,3] for both `s` and `f` and
-  utilization windows of (0, 1), (0, 0.4], [0.3, 0.7], and [0.6, 1).
+  standard deviation multipliers from the sets [1,3] for both strength and
+  friendliness. Utilization windows are (0, 1), (0, 0.4], [0.3, 0.7], and
+  [0.6, 1) with periods inside the window [10, 100].
 - `./1st-run-archive` contains our first run of this benchmark suite with the
   updated modeling. Contains a large amount of repeated data due to bad
   permutation management. **DEPRECATED**
@@ -19,7 +20,7 @@ can be reproduced by running the same script with a lower sample count (i.e.
 ## Titling Disambiguation
 
 In `./results`, each file is titled in the format
-`<core count>_<iteration count>_<s standard deviation multiplier>_<f standard deviation multiplier>_normal.txt`
+`<core count>_<iteration count>_<strength standard deviation multiplier>_<friendliness standard deviation multiplier>_normal.txt`
 where angle brackets represent substitutions.
 
 ## Data Format
