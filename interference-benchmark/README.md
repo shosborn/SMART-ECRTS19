@@ -4,7 +4,7 @@ Most changes are constrained to `./benchmarks/extra.h`.
 
 Run `./baselineWeighted.sh` and `./allPairsWeighted.sh` to execute benchmarks and determine the all-pairs performance degradation under SMT for TACLeBench.
 
-Our benchmark results used for the paper are in the `./results` directory and summarized in `./results/MoonlightData6.xlsx`.
+Our benchmark results used for the paper are in the `./results` directory and summarized in `./results/MoonlightData6.xlsx`. Some files are zipped due to GitHub size limits.
 
 Based off [the original TACLe benchmark collection](https://github.com/tacle/tacle-bench).
 
