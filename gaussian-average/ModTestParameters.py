@@ -43,14 +43,12 @@ def runParamTest(useOpt, m, binSize, max, beginUtil, utilMin, utilMax, periodMin
                 myTaskSet.addTask()
             else:
                 break
-        # JJB: I am very unclear why we need to randomly increment our claimed number of task sets per bin. Disabling for now.
-        """
-        # no true results --> add tasks to create dummy systems until reached max level of interest
+        # If we reach a task set that's unschedulable, assume it's unschedulable for higher utilizations.
+        # This step records that assumption for bins after the one that everyone failed on
+        # (We could just simulate all the higher-utilization bins, but that's slow.)
         totalUtil = myTaskSet.totalUtil
-
-        while totalUtil < m * FRACTION_TO_EXPLORE:
+        while totalUtil < m:
             totalUtil += random() * (myTaskSet.utilMax - myTaskSet.utilMin) + myTaskSet.utilMin
             myBin = int(np.floor((totalUtil - m) / binSize))
             theBins[myBin][0] += 1
-        """
     return theBins
