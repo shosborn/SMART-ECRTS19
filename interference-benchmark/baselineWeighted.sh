@@ -32,38 +32,8 @@ do
         else
                 maxJobs=$baseJobs
         fi
-
-	backgroundLoops=`expr $maxJobs \* 10000000`
-
-	#background programs
-	#note: C program will loop forever if output==0
-	PID_list=""
-	for k in {8..15}
-	do
-		if [ $k -ne $core ]
-		then
-			rand=$(( $RANDOM % 19 ))
-			#taskset -c $k chrt -f 97 ./${tacleProg[$rand]} NA $backgroundLoops NA NA NA NA 0 &
-			taskset -c $k chrt -f 96 ./${tacleProg[$rand]} NA $backgroundLoops NA NA NA NA 0 &
-
-
-			#PID[$k]=$!
-			lastPID=$!
-			PID_list="$PID_list $lastPID"
-	#		echo $lastPID ${tacleProg[$rand]}
-		fi
-	done
-
-	#echo $PID_list
-	
-	#echo backgroundRunning
-
 	#primary program
 	taskset -c $core chrt -f 97 ./${tacleProg[$i]} ${tacleProg[$i]} $maxJobs $core none none $runID 1 $PID_list	
-	#for k in {8..15}
-	#do
-	#	kill ${PID[$k]}
-	#done
 	echo ${tacleProg[$i]}
 done
 

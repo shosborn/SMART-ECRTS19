@@ -41,33 +41,6 @@ do
 	#Note: c program set to loop forever if output==0
 	for j in {0..18} #loop through programs
 	do
-		#background programs
-		PID_list=""
-		for k in {8..15}
-		do
-			if [ $k -ne $firstCore -a $k -ne $secondCore ]
-			then
-				rand=$(( $RANDOM % 19 ))
-				taskset -c $k chrt -f 96 ./${tacleProg[$rand]} NA $maxJobs NA NA NA NA 0 &
-				#PID[$k]=$!
-				lastPID=$!
-				PID_list="$PID_list $lastPID"
-			fi
-		done
-		
-		for k in {24..31}
-		do
-			if [ $k -ne $firstCore -a $k -ne $secondCore ]
-			then
-				rand=$(( $RANDOM % 19 ))
-				taskset -c $k chrt -f 96 ./${tacleProg[$rand]} NA $maxJobs NA NA NA NA 0 &
-				#PID[$k]=$!
-				lastPID=$!
-				PID_list="$PID_list $lastPID"
-			fi
-		done
-		
-	
 		#secondary program
 		taskset -c $secondCore chrt -f 97 ./${tacleProg[$j]} NA $backgroundLoops NA NA NA NA 0 &
 		lastPID=$!
