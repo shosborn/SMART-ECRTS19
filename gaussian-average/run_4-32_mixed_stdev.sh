@@ -15,10 +15,10 @@ mkdir -p results
 
 # All permutations of stdev 1 on s with [1,3] for f
 
-./RunTests.py 4 ${1} results/4_${1}_1_normal.txt &
-./RunTests.py 8 ${1} results/8_${1}_1_normal.txt &
-./RunTests.py 16 ${1} results/16_${1}_1_normal.txt &
-./RunTests.py 32 ${1} results/32_${1}_1_normal.txt &
+./RunTests.py 4 ${1} results/4_${1}_1_1_normal.txt &
+./RunTests.py 8 ${1} results/8_${1}_1_1_normal.txt &
+./RunTests.py 16 ${1} results/16_${1}_1_1_normal.txt &
+./RunTests.py 32 ${1} results/32_${1}_1_1_normal.txt &
 
 ./RunTests.py 4 ${1} results/4_${1}_1_2_normal.txt 0 1 2 &
 ./RunTests.py 8 ${1} results/8_${1}_1_2_normal.txt 0 1 2 &
