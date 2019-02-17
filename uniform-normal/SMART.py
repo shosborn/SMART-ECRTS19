@@ -36,8 +36,8 @@ class TaskSet:
                 resil = random() * (strength_p2 - strength_p1) + strength_p1
                 friend = random() * (friend_p2 - friend_p1) + friend_p1
             else:
-                resil = gauss(strength_mean, strength_stdev)
-                friend = gauss(friend_mean, friend_stdev)
+                resil = gauss(strength_p1, strength_p2)
+                friend = gauss(friend_p1, friend_p2)
             self.allTasks.append(SmartTask(util, period, friend, resil, permID))
             self.totalUtil = self.totalUtil + util
             permID = permID + 1
@@ -69,8 +69,8 @@ class TaskSet:
             resil = random() * (self.strength_p2 - self.strength_p1) + self.strength_p1
             friend = random() * (self.friend_p2 - self.friend_p1) + self.friend_p1
         else:
-            resil = gauss(self.strength_mean, self.strength_stdev)
-            friend = gauss(self.friend_mean, self.friend_stdev)
+            resil = gauss(self.strength_p1, self.strength_p2)
+            friend = gauss(self.friend_p1, self.friend_p2)
         self.allTasks.append(SmartTask(util, period, friend, resil, permID))
         self.totalUtil = self.totalUtil + util
         #set sym values for new task

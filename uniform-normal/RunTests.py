@@ -48,7 +48,7 @@ for utilBound in utilRanges:
         print("*****", file=f) # Sample delimiter
         csvWriter = csv.writer(f)
         if UNIFORM_NORMAL:
-            csvWriter.writerow([M, STEP, TASK_TARGET, utilBound[0], utilBound[1], 10, 100, strength_stdev, friend_stdev])
+            csvWriter.writerow([M, STEP, TASK_TARGET, utilBound[0], utilBound[1], 10, 100, STRENGTH_STDEV * STRENGTH_STDEV_MULTIPLIER, FRIEND_STDEV * FRIEND_STDEV_MULTIPLIER)
         else:
             csvWriter.writerow([M, STEP, TASK_TARGET, utilBound[0], utilBound[1], 10, 100, STRENGTH_DIST_BASE, STRENGTH_DIST_CEIL, FRIEND_DIST_BASE, FRIEND_DIST_CEIL, EPSILON])
         binSize = M
