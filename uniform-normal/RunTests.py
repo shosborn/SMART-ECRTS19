@@ -59,7 +59,7 @@ for utilBound in utilRanges:
     if UNIFORM_NORMAL:
         print(FILE_OUT, setsCompleted, utilBound[0], utilBound[1], STRENGTH_DIST_BASE, STRENGTH_DIST_CEIL, FRIEND_DIST_BASE, FRIEND_DIST_CEIL, EPSILON)
     else:
-        print(FILE_OUT, setsCompleted, utilBound[0], utilBound[1], strength_stdev, friend_stdev)
+        print(FILE_OUT, setsCompleted, utilBound[0], utilBound[1], STRENGTH_STDEV * STRENGTH_STDEV_MULTIPLIER, FRIEND_STDEV * FRIEND_STDEV_MULTIPLIER)
     setsCompleted += 1
 
 print(FILE_OUT, "Complete!")
