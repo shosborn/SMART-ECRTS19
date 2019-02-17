@@ -9,69 +9,46 @@ AWARE_START_OBLIV=SMART.Partition.AWARE_START_OBLIV
 OPTIMAL=SMART.Partition.OPTIMAL
 NUM_METHODS=5
 
-#(setUtil, utilMin, utilMax, periodMin, periodMax, rMin, rMax, fMin, fMax, epsilon)
+def runParamTest(useOpt, m, binSize, max, beginUtil, utilMin, utilMax, periodMin, periodMax, strength_p1, strength_p2, friend_p1, friend_p2, epsilon):
 
-def runParamTest(useOpt, m, binSize, max, beginUtil, utilMin, utilMax, periodMin, periodMax, rMin, rMax, fMin, fMax, epsilon):
-    #m=2
-
-    #max=100
-    #binSize=.05
-    numBins=int(np.ceil(2*m/binSize))
-    theBins=[]
+    numBins = int(np.ceil(m/binSize))
+    # "theBins": index 0 is number of task sets in bin, following indicies are how many of those are schedulable for various algorithms
+    theBins = []
     for i in range(0, numBins):
-        theBins.append([0]*11)
-    #myResults=TaskSetResults(myTaskSet.totalUtil)
+        theBins.append([0] * 11)
 
-    parameterResults=[]
+    parameterResults = []
 
-
-    #for count in range(1, max+1):
-    while theBins[0][0]<max:
-        #myTaskSet = SMART.TaskSet(.5*m, 0, .3, 10, 100, .7, 1, .7, 1, .1)
-        myTaskSet=SMART.TaskSet(beginUtil, utilMin, utilMax, periodMin, periodMax, rMin, rMax, fMin, fMax, epsilon)
+    # Iterate until we've tried at least 'max' task sets at our base utilization
+    # Each iteration of this tests at least one task set per bin
+    while theBins[0][0] < max:
+        myTaskSet = SMART.TaskSet(beginUtil, utilMin, utilMax, periodMin, periodMax, strength_p1, strength_p2, friend_p1, friend_p2, epsilon)
+        # Loop until we reach a task set that nothing can schedule
         while True:
-            #partition and test task set
-            while myTaskSet.totalUtil<m:
+            # Make sure we have at least enough utilization to reach the first bin (at m)
+            while myTaskSet.totalUtil < m:
                 myTaskSet.addTask()
-            myBin=int(np.floor((myTaskSet.totalUtil-m)/binSize))
-            theBins[myBin][0]=theBins[myBin][0]+1
-            success=False
-            #systemResults=[None] * 11
-            #parameterResults.append(systemResults)
-            #systemResults[0]=myTaskSet.totalUtil
+            # Depending on where our utilization fell as we added tasks, we choose a bin
+            myBin = int(np.floor((myTaskSet.totalUtil - m) / binSize))
+            theBins[myBin][0] += 1 # One more sample for this bin
+            # Test if each algorthm can schedule this set
             for method in range(OBLIVIOUS, OPTIMAL+useOpt):
                 myTaskSet.partitionTasks(method)
-                theseResults=myTaskSet.partitionList[method].testUmaFunk(m)
-                theBins[myBin][method]=theBins[myBin][method]+theseResults[SMART.UMA_RESULT]
-                theBins[myBin][method+NUM_METHODS] = theBins[myBin][method+NUM_METHODS] + theseResults[SMART.FUNK_RESULT]
-                #systemResults[method]=theseResults[SMART.UMA_RESULT]
-                #systemResults[method+NUM_METHODS]=theseResults[SMART.FUNK_RESULT]
-                #if theseResults[SMART.UMA_RESULT] or theseResults[SMART.FUNK_RESULT]:
-                if theseResults[SMART.UMA_RESULT] + theseResults[SMART.FUNK_RESULT]>0:
-                    success=True
-            if success:
+                theseResults = myTaskSet.partitionList[method].testUmaFunk(m)
+                # We use two schedulability tests. Make sure to store the results for both.
+                theBins[myBin][method] += theseResults[SMART.UMA_RESULT]
+                theBins[myBin][method+NUM_METHODS] += theseResults[SMART.FUNK_RESULT]
+            # If any algorithm had any successes, keep adding work (and potentially fall into higher bins) until that's not true
+            if sum(theBins[myBin][OBLIVIOUS:]):
                 myTaskSet.addTask()
             else:
                 break
-        # no true results --> add tasks to create dummy systems until reached max level of interest
-        totalUtil=myTaskSet.totalUtil
-        '''
-        while totalUtil<1*m:
-            systemResults = [None] * 11
-            parameterResults.append(systemResults)
-            totalUtil=totalUtil+random() * (myTaskSet.utilMax - myTaskSet.utilMin) + myTaskSet.utilMin
-            systemResults[0]=totalUtil
-            for i in range (1, 11):
-                systemResults[i]=False
-        '''
-        while totalUtil<2*m:
-            totalUtil=totalUtil+random() * (myTaskSet.utilMax - myTaskSet.utilMin) + myTaskSet.utilMin
+        # If we reach a task set that's unschedulable, assume it's unschedulable for higher utilizations.
+        # This step records that assumption for bins after the one that everyone failed on
+        # (We could just simulate all the higher-utilization bins, but that's slow.)
+        totalUtil = myTaskSet.totalUtil
+        while totalUtil < m:
+            totalUtil += random() * (myTaskSet.utilMax - myTaskSet.utilMin) + myTaskSet.utilMin
             myBin = int(np.floor((totalUtil - m) / binSize))
-            theBins[myBin][0]=theBins[myBin][0]+1
-    #for sysResult in parameterResults:
-     #    print(sysResult)
-
-    #for i in range (0, len(theBins)):
-    #    print (m+i*binSize, theBins[i])
-
+            theBins[myBin][0] += 1
     return theBins

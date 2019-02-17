@@ -2,32 +2,28 @@ from random import *
 import numpy as np
 import itertools
 
-# def main():
-#   TaskSet(8, .7, 1, 10, 100, .7, 1, .7, 1, .1)
-
-
 FAKE_ZERO = 0.00000000001
 UMA_RESULT=0
 FUNK_RESULT=1
 
-
 class TaskSet:
     """Description String"""
 
-    def __init__(self, setUtil, utilMin, utilMax, periodMin, periodMax, rMin, rMax, fMin, fMax, epsilon):
+    def __init__(self, setUtil, utilMin, utilMax, periodMin, periodMax, strength_p1, strength_p2, friend_p1, friend_p2, epsilon):
         """Creates taskSet made of SmartTasks"""
         self.setUtil = setUtil
         self.utilMin = utilMin
         self.utilMax = utilMax
         self.periodMin = periodMin
         self.periodMax = periodMax
-        self.rMin = rMin
-        self.rMax = rMax
-        self.fMin = fMin
-        self.fMax = fMax
+        self.strength_p1 = strength_p1
+        self.strength_p2 = strength_p2
+        self.friend_p1 = friend_p1
+        self.friend_p2 = friend_p2
         self.epsilon = epsilon
         self.allTasks = []
         self.partitionList = [None] * 10
+        self.uniform_normal = bool(epsilon - 1)
 
         # create tasks, but don't set s_{i:j} values yet
         self.totalUtil = 0
@@ -36,13 +32,14 @@ class TaskSet:
             # create task
             util = random() * (utilMax - utilMin) + utilMin
             period = random() * (periodMax - periodMin) + periodMin
-            friend = random() * (fMax - fMin) + fMin
-            resil = random() * (rMax - rMin) + rMin
+            if self.uniform_normal:
+                resil = random() * (strength_p2 - strength_p1) + strength_p1
+                friend = random() * (friend_p2 - friend_p1) + friend_p1
+            else:
+                resil = gauss(strength_mean, strength_stdev)
+                friend = gauss(friend_mean, friend_stdev)
             self.allTasks.append(SmartTask(util, period, friend, resil, permID))
             self.totalUtil = self.totalUtil + util
-            # print(permID)
-            # print(self.allTasks[permID])
-            # update total util
             permID = permID + 1
         nTotal = permID
 
@@ -52,8 +49,7 @@ class TaskSet:
             task.symRaw = []
             task.symAdj = []
             for j in range(0, nTotal):
-                #task.symRaw.append(task.resil * self.allTasks[j].friend + (random() * 2 * epsilon - epsilon))
-                task.symRaw.append(np.random.normal(task.resil * self.allTasks[j].friend, self.epsilon))
+                task.symRaw.append(self.calcInterference(task, self.allTasks[j]))
                 if i==j:
                     task.symAdj.append(1)
                 elif task.symRaw[j] <= 0:
@@ -69,18 +65,21 @@ class TaskSet:
         nTotal=permID=len(self.allTasks)
         util = random() * (self.utilMax - self.utilMin) + self.utilMin
         period = random() * (self.periodMax - self.periodMin) + self.periodMin
-        friend = random() * (self.fMax - self.fMin) + self.fMin
-        resil = random() * (self.rMax - self.rMin) + self.rMin
+        if self.uniform_normal:
+            resil = random() * (self.strength_p2 - self.strength_p1) + self.strength_p1
+            friend = random() * (self.friend_p2 - self.friend_p1) + self.friend_p1
+        else:
+            resil = gauss(self.strength_mean, self.strength_stdev)
+            friend = gauss(self.friend_mean, self.friend_stdev)
         self.allTasks.append(SmartTask(util, period, friend, resil, permID))
         self.totalUtil = self.totalUtil + util
         #set sym values for new task
-        task=self.allTasks[permID]
-        nTotal=nTotal+1
+        task = self.allTasks[permID]
+        nTotal += 1
         task.symRaw = []
         task.symAdj = []
         for j in range(0, nTotal):
-            #task.symRaw.append(task.resil * self.allTasks[j].friend + (random() * 2 * self.epsilon - self.epsilon))
-            task.symRaw.append(np.random.normal(task.resil * self.allTasks[j].friend, self.epsilon))
+            task.symRaw.append(self.calcInterference(task, self.allTasks[j]))
             if permID == j:
                 task.symAdj.append(1)
             elif task.symRaw[j] <= 0:
@@ -91,9 +90,8 @@ class TaskSet:
                 task.symAdj.append(task.symRaw[j])
         #update sym values for existing tasks
         for j in range(0, nTotal):
-            old=self.allTasks[j]
-            #old.symRaw.append(old.resil * task.friend + (random() * 2 * self.epsilon -self.epsilon))
-            old.symRaw.append(np.random.normal(old.resil * task.friend, self.epsilon))
+            old = self.allTasks[j]
+            old.symRaw.append(self.calcInterference(old, task))
             if old.symRaw[permID]<=0:
                 old.symAdj.append(FAKE_ZERO)
             elif old.symRaw[permID]>1:
@@ -101,6 +99,11 @@ class TaskSet:
             else:
                 old.symAdj.append(old.symRaw[permID])
 
+    def calcInterference(self, t1, t2):
+        if self.uniform_normal:
+            return np.random.normal(t1.resil * t2.friend, self.epsilon)
+        else:
+            return (t1.resil + t2.friend) / 2.0
 
 
     def partitionTasks(self, method):
@@ -109,14 +112,14 @@ class TaskSet:
 
 
 class Partition:
-    ALL_THREAD = 6
-    ALL_PHYS = 0
-    OBLIVIOUS = 1
-    OBLIVIOUS_PLUS = 7
+    ALL_PHYS = 0 # Off
+    OBLIVIOUS = 1 
     AWARE_START_THREAD = 2
     AWARE_START_PHYS = 3
     AWARE_START_OBLIV = 4
-    OPTIMAL = 5
+    OPTIMAL = 5 # Output, but always 0 unless configured
+    ALL_THREAD = 6 # Off
+    OBLIVIOUS_PLUS = 7 # Off
     #MAX_LOOPS = len(someTasks)
 
     def __init__(self, someTasks, method):
@@ -210,12 +213,13 @@ class Partition:
             Uma=1
         else:
             Uma=0
-        sum2 = sum1 + threadedUtilList[int(2 * mh + 1)]
-        if sum1 <= 2 * mh + ah and sum2 <= 2 * (mh + ah):
-            Funk=1
-        else:
-            Funk=0
-        return(Uma, Funk)
+        # Disable funk for now
+        #sum2 = sum1 + threadedUtilList[int(2 * mh + 1)]
+        #if sum1 <= 2 * mh + ah and sum2 <= 2 * (mh + ah):
+        #    Funk=1
+        #else:
+        #    Funk=0
+        return(Uma, 0)#Funk)
 
     def coresNeededShared(self):
         threadedUtilList = []
