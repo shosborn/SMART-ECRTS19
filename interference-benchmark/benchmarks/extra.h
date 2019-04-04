@@ -37,11 +37,6 @@
 	kill (killMe, SIGKILL);}
 	
 
-//	if (otherPID>0) kill(otherPID, SIGKILL);\
-
-//if output==0, endless loop
-//avoids int overflow error with large numbers for background loops
-
 #define WRITE_TO_FILE if (output){\
 	munlockall();\
 	KILL_OTHERS\
@@ -70,27 +65,12 @@ bigArray=NULL;
 		
 #define STOP_TIMER clock_gettime(CLOCK_MONOTONIC, &end);
 
-
-//waste a millisecond
-
-#define WASTE_TIME clock_gettime(CLOCK_MONOTONIC, &start);\
-do{clock_gettime(CLOCK_MONOTONIC, &end);}\
-while( (end.tv_sec*1000000000+end.tv_nsec)-(start.tv_sec*1000000000+start.tv_nsec) < 1000000);
-
-
 #define SLEEP nanosleep((const struct timespec[]){{0, 1000000}}, NULL);
 
-//#define LOOP_WASTE for(wasteCount=0; wasteCount<1000000; wasteCount++){}
-
-//at beginning of loop clear cache, waste some time
-//wasting time allows interfering process to build up some cache presence
-//using sleep instead of waste time loop causes problems
-//both sleeping and spinning give advantage to threaded task
+//at beginning of loop clear cache
 #define START_LOOP if (output) {KILL_CACHE  START_TIMER}
 
 #define STOP_LOOP if (output) {STOP_TIMER SAVE_RESULTS}
-//if (!output) {jobsComplete--;}
-
 
 /*
 Intended structure
