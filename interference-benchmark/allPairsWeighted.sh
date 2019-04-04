@@ -38,7 +38,6 @@ do
 	
 	#echo $backgroundLoops
 
-	#Note: c program set to loop forever if output==0
 	for j in {0..18} #loop through programs
 	do
 		#secondary program
